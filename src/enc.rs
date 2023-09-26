@@ -18,7 +18,7 @@ pub fn encode_eventsig(eventsig: &str) -> SH256 {
     result
 }
 
-pub fn encode_attestation_dependency(items: &Vec<(SH160, SH256)>) -> Vec<u8> {
+pub fn encode_address_bytes32_vec(items: &Vec<(SH160, SH256)>) -> Vec<u8> {
     let mut data = Vec::<u8>::new();
     let mut args_buf = [0_u8; 32];
     let array_len: U256 = items.len().into();
@@ -28,15 +28,15 @@ pub fn encode_attestation_dependency(items: &Vec<(SH160, SH256)>) -> Vec<u8> {
     data.extend_from_slice(&args_buf);
 
     // zero out the array
-    let mut registry_buf = [0_u8; 32];
-    let mut hash_buf = [0_u8; 32];
+    let mut address_data = [0_u8; 32];
+    let mut bytes32_data = [0_u8; 32];
 
     // all subsequent elements in big endian
     for item in items {
-        registry_buf[12..32].copy_from_slice(item.0.as_bytes());
-        data.extend_from_slice(&registry_buf);
-        hash_buf.copy_from_slice(item.1.as_bytes());
-        data.extend_from_slice(&hash_buf);
+        address_data[12..32].copy_from_slice(item.0.as_bytes());
+        data.extend_from_slice(&address_data);
+        bytes32_data.copy_from_slice(item.1.as_bytes());
+        data.extend_from_slice(&bytes32_data);
     }
     data
 }
@@ -264,7 +264,7 @@ impl<'a> EncodeArg<Vec<(SH160, SH256)>> for Encoder<'a> {
             index: self.args.len(),
         });
 
-        let dynarg_data = encode_attestation_dependency(val);
+        let dynarg_data = encode_address_bytes32_vec(val);
         let data_len: U256 = self.data.len().into();
         let mut data_len_buf = [0_u8; 32];
         data_len.to_big_endian(&mut data_len_buf[..]);
