@@ -12,19 +12,13 @@ pub struct Encoder<'a> {
     static_flag: bool,
 }
 
-#[derive(Debug, Clone)]
-pub struct AttestationDependency {
-    pub registry: SH160,
-    pub hash: SH256,
-}
-
 pub fn encode_eventsig(eventsig: &str) -> SH256 {
     let mut result = SH256::default();
     result.0 = keccak_hash(eventsig.as_bytes());
     result
 }
 
-pub fn encode_attestation_dependency(items: &Vec<AttestationDependency>) -> Vec<u8> {
+pub fn encode_attestation_dependency(items: &Vec<(SH160, SH256)>) -> Vec<u8> {
     let mut data = Vec::<u8>::new();
     let mut args_buf = [0_u8; 32];
     let array_len: U256 = items.len().into();
@@ -39,9 +33,9 @@ pub fn encode_attestation_dependency(items: &Vec<AttestationDependency>) -> Vec<
 
     // all subsequent elements in big endian
     for item in items {
-        registry_buf[12..32].copy_from_slice(item.registry.as_bytes());
+        registry_buf[12..32].copy_from_slice(item.0.as_bytes());
         data.extend_from_slice(&registry_buf);
-        hash_buf.copy_from_slice(item.hash.as_bytes());
+        hash_buf.copy_from_slice(item.1.as_bytes());
         data.extend_from_slice(&hash_buf);
     }
     data
@@ -262,8 +256,8 @@ impl<'a> EncodeArg<Vec<SH160>> for Encoder<'a> {
     }
 }
 
-impl<'a> EncodeArg<Vec<AttestationDependency>> for Encoder<'a> {
-    fn add(&mut self, val: &Vec<AttestationDependency>) {
+impl<'a> EncodeArg<Vec<(SH160, SH256)>> for Encoder<'a> {
+    fn add(&mut self, val: &Vec<(SH160, SH256)>) {
         self.static_flag = false;
         self.reloc.push(EncoderReloc {
             section: EncoderRelocSection::Args,
