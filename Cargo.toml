@@ -14,6 +14,7 @@ tstd = ["sgxlib/tstd", "eth_types/tstd", "crypto/tstd"]
 sgxlib = { git = "https://github.com/automata-network/sgxlib", default-features = false }
 eth_types = { git = "https://github.com/automata-network/eth-types-rs", default-features = false }
 crypto = { git = "https://github.com/automata-network/crypto-rs", default-features = false }
+# glog = { git = "https://github.com/automata-network/glog-rs", default-features = false }
 
 [patch.'https://github.com/apache/teaclave-sgx-sdk.git']
 sgx_alloc = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
@@ -21,7 +22,6 @@ sgx_backtrace_sys = { git = "https://github.com/automata-network/incubator-teacl
 sgx_build_helper = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
 sgx_demangle = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
 sgx_libc = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
-# sgx_rand = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
 sgx_tcrypto = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
 sgx_ucrypto = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
 sgx_tkey_exchange = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
