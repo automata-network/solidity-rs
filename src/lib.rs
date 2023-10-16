@@ -4,6 +4,8 @@
 #[macro_use]
 extern crate sgxlib as std;
 
+use std::prelude::v1::*;
+
 mod encode;
 pub use encode::*;
 
