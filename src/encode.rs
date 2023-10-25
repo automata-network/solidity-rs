@@ -149,6 +149,29 @@ impl<'a> Encoder<'a> {
         }
         data
     }
+
+    pub fn encode_address_bytes32_vec(items: &Vec<(SH160, SH256)>) -> Vec<u8> {
+        let mut data = Vec::<u8>::new();
+        let mut args_buf = [0_u8; 32];
+        let array_len: U256 = items.len().into();
+
+        // first 32byte value is the array length in big endian
+        array_len.to_big_endian(&mut args_buf);
+        data.extend_from_slice(&args_buf);
+
+        // zero out the array
+        let mut address_data = [0_u8; 32];
+        let mut bytes32_data = [0_u8; 32];
+
+        // all subsequent elements in big endian
+        for item in items {
+            address_data[12..32].copy_from_slice(item.0.as_bytes());
+            data.extend_from_slice(&address_data);
+            bytes32_data.copy_from_slice(item.1.as_bytes());
+            data.extend_from_slice(&bytes32_data);
+        }
+        data
+    }
 }
 
 impl<'a> EncodeArg<SH160> for Encoder<'a> {
@@ -241,6 +264,26 @@ impl<'a> EncodeArg<Vec<SH160>> for Encoder<'a> {
         self.args.push(EncoderArgument::Word {
             bytes: data_len_buf,
             datatype: "address[]".to_owned(),
+        });
+        self.data.extend(dynarg_data);
+    }
+}
+
+impl<'a> EncodeArg<Vec<(SH160, SH256)>> for Encoder<'a> {
+    fn add(&mut self, val: &Vec<(SH160, SH256)>) {
+        self.static_flag = false;
+        self.reloc.push(EncoderReloc {
+            section: EncoderRelocSection::Args,
+            index: self.args.len(),
+        });
+
+        let dynarg_data = Self::encode_address_bytes32_vec(val);
+        let data_len: U256 = self.data.len().into();
+        let mut data_len_buf = [0_u8; 32];
+        data_len.to_big_endian(&mut data_len_buf[..]);
+        self.args.push(EncoderArgument::Word {
+            bytes: data_len_buf,
+            datatype: "(address,bytes32)[]".to_owned(),
         });
         self.data.extend(dynarg_data);
     }
